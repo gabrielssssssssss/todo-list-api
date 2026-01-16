@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"net/url"
 	"os"
 	"time"
 
@@ -12,17 +11,20 @@ import (
 )
 
 func NewPostgresDatabase() (*sql.DB, error) {
-	POSTGRES_DB := url.QueryEscape(os.Getenv("POSTGRES_DB"))
-	POSTGRES_HOST := url.QueryEscape(os.Getenv("POSTGRES_HOST"))
-	POSTGRES_USR := url.QueryEscape(os.Getenv("POSTGRES_USR"))
-	POSTGRES_PWD := url.QueryEscape(os.Getenv("POSTGRES_PWD"))
-	POSTGRES_URL := fmt.Sprintf("postgres://%s:%s@%s:5432/%s?sslmode=disable", POSTGRES_USR, POSTGRES_PWD, POSTGRES_HOST, POSTGRES_DB)
-	fmt.Println(POSTGRES_URL)
+	POSTGRES_DB := os.Getenv("POSTGRES_DB")
+	POSTGRES_HOST := os.Getenv("POSTGRES_HOST")
+	POSTGRES_USR := os.Getenv("POSTGRES_USR")
+	POSTGRES_PWD := os.Getenv("POSTGRES_PWD")
+
+	POSTGRES_URL := fmt.Sprintf(
+		"postgresql://%s:%s@%s:5432/%s?sslmode=disable",
+		POSTGRES_USR, POSTGRES_PWD, POSTGRES_HOST, POSTGRES_DB,
+	)
+
 	client, err := sql.Open("postgres", POSTGRES_URL)
 	if err != nil {
 		return nil, err
 	}
-	defer client.Close()
 
 	if err = client.Ping(); err != nil {
 		return nil, err
