@@ -11,12 +11,12 @@ type TaskRepository interface {
 	AddTask(entity *entity.TaskEntity) (*model.TaskModel, error)
 }
 
-type taskImplementation struct {
+type taskRepositoryImpl struct {
 	db *sql.DB
 }
 
 func NewTaskRepository(client *sql.DB) TaskRepository {
-	return &taskImplementation{
+	return &taskRepositoryImpl{
 		db: client,
 	}
 }

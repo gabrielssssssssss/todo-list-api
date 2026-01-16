@@ -8,7 +8,7 @@ import (
 	"github.com/gabrielssssssssss/todo-list-api/internal/model"
 )
 
-func (client *taskImplementation) AddTask(entity *entity.TaskEntity) (*model.TaskModel, error) {
+func (impl *taskRepositoryImpl) AddTask(entity *entity.TaskEntity) (*model.TaskModel, error) {
 	_, cancel := config.NewPostgresContext()
 	defer cancel()
 
@@ -17,7 +17,7 @@ func (client *taskImplementation) AddTask(entity *entity.TaskEntity) (*model.Tas
 		entity.Title, entity.Description, entity.Status,
 	)
 
-	response, err := client.db.Query(query)
+	response, err := impl.db.Query(query)
 	if err != nil {
 		return nil, err
 	}

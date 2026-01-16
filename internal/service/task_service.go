@@ -10,11 +10,11 @@ type TaskService interface {
 }
 
 type taskServiceImpl struct {
-	query repository.TaskRepository
+	repository repository.TaskRepository
 }
 
-func NewService(taskRepository repository.TaskRepository) TaskService {
+func NewTaskService(taskRepository repository.TaskRepository) TaskService {
 	return &taskServiceImpl{
-		query: taskRepository,
+		repository: taskRepository,
 	}
 }
