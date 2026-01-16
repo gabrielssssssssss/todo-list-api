@@ -24,6 +24,7 @@ func (controller *TaskController) AddTask(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
+		c.Abort()
 	}
 
 	response, err := controller.TaskService.AddTask(&request)
@@ -31,7 +32,26 @@ func (controller *TaskController) AddTask(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
+		c.Abort()
 	}
 
 	c.JSON(http.StatusOK, response)
+}
+
+func (controller *TaskController) DeleteTask(c *gin.Context) {
+	var id = c.Param("id")
+
+	input := model.TaskModel{
+		Id: id,
+	}
+
+	_, err := controller.TaskService.DeleteTask(&input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		c.Abort()
+	}
+
+	c.Status(204)
 }
