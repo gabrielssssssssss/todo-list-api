@@ -27,3 +27,20 @@ func (impl *taskRepositoryImpl) AddTask(entity *entity.TaskEntity) (*model.TaskM
 
 	return &response, nil
 }
+
+func (impl *taskRepositoryImpl) DeleteTask(entity *entity.TaskEntity) (bool, error) {
+	_, cancel := config.NewPostgresContext()
+	defer cancel()
+
+	query := fmt.Sprintf(
+		`DELETE FROM tasks WHERE id = %s;`,
+		entity.Id,
+	)
+
+	_, err := impl.db.Query(query)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}

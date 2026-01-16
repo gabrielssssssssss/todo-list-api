@@ -24,3 +24,20 @@ func (impl taskServiceImpl) AddTask(request *model.TaskModel) (*model.TaskModel,
 
 	return response, nil
 }
+
+func (impl taskServiceImpl) DeleteTask(request *model.TaskModel) (bool, error) {
+	if request.Id == "" {
+		return false, fmt.Errorf("The value is not number.")
+	}
+
+	input := entity.TaskEntity{
+		Id: request.Id,
+	}
+
+	response, err := impl.repository.DeleteTask(&input)
+	if err != nil {
+		return false, err
+	}
+
+	return response, nil
+}

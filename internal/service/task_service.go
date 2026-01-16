@@ -7,6 +7,7 @@ import (
 
 type TaskService interface {
 	AddTask(request *model.TaskModel) (*model.TaskModel, error)
+	DeleteTask(request *model.TaskModel) (bool, error)
 }
 
 type taskServiceImpl struct {

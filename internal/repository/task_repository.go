@@ -9,6 +9,7 @@ import (
 
 type TaskRepository interface {
 	AddTask(entity *entity.TaskEntity) (*model.TaskModel, error)
+	DeleteTask(entity *entity.TaskEntity) (bool, error)
 }
 
 type taskRepositoryImpl struct {
