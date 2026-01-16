@@ -23,5 +23,5 @@ func Controller() {
 	app := gin.Default()
 	apiGroup := app.Group("/api")
 	taskController.Route(apiGroup)
-	app.Run(":8080")
+	app.Run(":8082")
 }

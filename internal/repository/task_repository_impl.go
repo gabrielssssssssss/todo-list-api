@@ -2,8 +2,8 @@ package repository
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
+	"time"
 
 	"github.com/gabrielssssssssss/todo-list-api/config"
 	"github.com/gabrielssssssssss/todo-list-api/internal/entity"
@@ -47,25 +47,25 @@ func (impl *taskRepositoryImpl) DeleteTask(entity *entity.TaskEntity) (bool, err
 	return true, nil
 }
 
-func (impl *taskRepositoryImpl) UpdateTask(entity *entity.TaskEntity) (*model.TaskModel, error) {
+func (impl *taskRepositoryImpl) UpdateTask(entity entity.TaskEntity) (*model.TaskModel, error) {
 	_, cancel := config.NewPostgresContext()
 	defer cancel()
 
 	var payload []string
 
-	k := reflect.TypeOf(entity)
-	v := reflect.ValueOf(entity)
-
-	for i := 0; i < k.NumField(); i++ {
-		key, value := v.Field(i).Interface(), k.Field(i).Name
-		if value != "" {
-			payload = append(payload, fmt.Sprintf("%s = %s", key, value))
-		}
+	if entity.Description != "" {
+		payload = append(payload, fmt.Sprintf("description = '%s'", entity.Description))
+	}
+	if entity.Status != "" {
+		payload = append(payload, fmt.Sprintf("status = '%s'", entity.Status))
+	}
+	if entity.Title != "" {
+		payload = append(payload, fmt.Sprintf("title = '%s'", entity.Title))
 	}
 
 	query := fmt.Sprintf(
-		`UPDATE tasks SET %s WHERE id = %s;`,
-		strings.Join(payload, ","), entity.Id,
+		`UPDATE tasks SET %s, "updatedAt" = '%s' WHERE id = %s RETURNING "id", "title", "description", "status", "createdAt", "updatedAt";`,
+		strings.Join(payload, ", "), time.Now().Format("2006-01-02 15:04:05.000000"), entity.Id,
 	)
 
 	var response model.TaskModel
