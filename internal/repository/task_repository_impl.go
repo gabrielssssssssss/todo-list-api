@@ -13,8 +13,8 @@ func (client *taskImplementation) AddTask(entity *entity.TaskEntity) (*model.Tas
 	defer cancel()
 
 	query := fmt.Sprintf(
-		"INSERT INTO tasks(description, status) VALUES (%s, %s)",
-		entity.Description, entity.Status,
+		"INSERT INTO tasks(title, description, status) VALUES (%s, %s, %s)",
+		entity.Title, entity.Description, entity.Status,
 	)
 
 	response, err := client.db.Query(query)
