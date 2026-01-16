@@ -41,3 +41,18 @@ func (impl taskServiceImpl) DeleteTask(request *model.TaskModel) (bool, error) {
 
 	return response, nil
 }
+
+func (impl taskServiceImpl) UpdateTask(request *model.TaskModel) (*model.TaskModel, error) {
+	input := entity.TaskEntity{
+		Title:       request.Title,
+		Status:      request.Status,
+		Description: request.Description,
+	}
+
+	response, err := impl.repository.UpdateTask(&input)
+	if err != nil {
+		return response, err
+	}
+
+	return response, nil
+}

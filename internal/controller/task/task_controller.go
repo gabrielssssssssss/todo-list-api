@@ -55,3 +55,26 @@ func (controller *TaskController) DeleteTask(c *gin.Context) {
 
 	c.Status(204)
 }
+
+func (controller *TaskController) UpdateTask(c *gin.Context) {
+	var request model.TaskModel
+
+	request.Id = c.Param("id")
+	err := c.ShouldBindBodyWithJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		c.Abort()
+	}
+
+	response, err := controller.TaskService.UpdateTask(&request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		c.Abort()
+	}
+
+	c.JSON(http.StatusOK, response)
+}
