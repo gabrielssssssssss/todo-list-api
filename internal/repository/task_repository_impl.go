@@ -13,15 +13,17 @@ func (impl *taskRepositoryImpl) AddTask(entity *entity.TaskEntity) (*model.TaskM
 	defer cancel()
 
 	query := fmt.Sprintf(
-		"INSERT INTO tasks(title, description, status) VALUES (%s, %s, %s)",
+		"INSERT INTO tasks (title, description, status) VALUES ('%s', '%s', '%s') RETURNING id, title, description, status;",
 		entity.Title, entity.Description, entity.Status,
 	)
 
-	response, err := impl.db.Query(query)
+	var response model.TaskModel
+	err := impl.db.QueryRow(query).Scan(
+		&response.Id, &response.Title, &response.Description, &response.Status,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println(response.Scan("title"))
-	return nil, nil
+	return &response, nil
 }
