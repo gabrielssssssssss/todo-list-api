@@ -107,10 +107,17 @@ func (impl *taskRepositoryImpl) GetTasks(entity *entity.TaskPaginationEntity) (*
 		tasks = append(tasks, task)
 	}
 
+	var count int64
+	err = impl.db.QueryRow("SELECT COUNT(*) FROM tasks;").Scan(&count)
+	if err != nil {
+		return nil, err
+	}
+
 	response = model.TaskPaginationModel{
 		Data:  tasks,
 		Limit: entity.Limit,
 		Page:  entity.Page + 1,
+		Total: count,
 	}
 
 	return &response, nil
