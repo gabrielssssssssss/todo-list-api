@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/gabrielssssssssss/todo-list-api/helper"
@@ -12,7 +13,7 @@ var (
 	JWT_SECRET_KEY = []byte(os.Getenv("JWT_SECRET_KEY"))
 )
 
-func (impl *userRepositoryImpl) AddUser(entity *entity.UserEntity) (*model.UserTokenModel, error) {
+func (impl *userRepositoryImpl) Register(entity *entity.UserEntity) (*model.UserTokenModel, error) {
 	query := `
 		INSERT INTO users (
 			name, 
@@ -29,6 +30,28 @@ func (impl *userRepositoryImpl) AddUser(entity *entity.UserEntity) (*model.UserT
 		entity.Password).Scan(&entity.Id)
 	if err != nil {
 		return nil, err
+	}
+
+	token, err := helper.GenerateJwtToken(entity.Id, entity.Email, JWT_SECRET_KEY)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.UserTokenModel{Token: token}, nil
+}
+
+func (impl *userRepositoryImpl) Login(entity *entity.UserEntity) (*model.UserTokenModel, error) {
+	var hashPassword *string
+	err := impl.db.QueryRow(
+		`SELECT password FROM users WHERE email = $1`,
+		entity.Email,
+	).Scan(&hashPassword)
+	if err != nil {
+		return nil, err
+	}
+
+	if !helper.VerifyPassword(entity.Password, *hashPassword) {
+		return nil, fmt.Errorf("Invalid credentials.")
 	}
 
 	token, err := helper.GenerateJwtToken(entity.Id, entity.Email, JWT_SECRET_KEY)

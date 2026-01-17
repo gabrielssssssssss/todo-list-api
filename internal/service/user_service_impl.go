@@ -8,7 +8,7 @@ import (
 	"github.com/gabrielssssssssss/todo-list-api/internal/model"
 )
 
-func (impl userServiceImpl) AddUser(request *model.UserModel) (*model.UserTokenModel, error) {
+func (impl userServiceImpl) Register(request *model.UserModel) (*model.UserTokenModel, error) {
 	if !helper.IsEmailValid(request.Email) || !helper.IsStrongerPassword(request.Password) {
 		return nil, fmt.Errorf("Email or password doesnt match with correct value.")
 	}
@@ -24,7 +24,21 @@ func (impl userServiceImpl) AddUser(request *model.UserModel) (*model.UserTokenM
 		Password: hashedPassword,
 	}
 
-	response, err := impl.repository.AddUser(&input)
+	response, err := impl.repository.Register(&input)
+	if err != nil {
+		return response, err
+	}
+
+	return response, nil
+}
+
+func (impl userServiceImpl) Login(request *model.UserModel) (*model.UserTokenModel, error) {
+	input := entity.UserEntity{
+		Email:    request.Email,
+		Password: request.Password,
+	}
+
+	response, err := impl.repository.Login(&input)
 	if err != nil {
 		return response, err
 	}
