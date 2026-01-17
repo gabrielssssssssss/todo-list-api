@@ -8,14 +8,14 @@ import (
 )
 
 type JWTClaim struct {
-	Name  string
+	Id    string
 	Email string
 	jwt.RegisteredClaims
 }
 
-func GenerateJwtToken(name string, email string, key []byte) (string, error) {
+func GenerateJwtToken(id string, email string, key []byte) (string, error) {
 	claims := JWTClaim{
-		Name:  name,
+		Id:    id,
 		Email: email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 300)),

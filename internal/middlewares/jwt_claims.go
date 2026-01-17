@@ -11,7 +11,7 @@ var (
 )
 
 type JWTClaim struct {
-	Name  string
+	Id    string
 	Email string
 	jwt.RegisteredClaims
 }

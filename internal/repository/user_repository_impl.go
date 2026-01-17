@@ -18,18 +18,20 @@ func (impl *userRepositoryImpl) AddUser(entity *entity.UserEntity) (*model.UserT
 			name, 
 			email,
 			password
-		) VALUES ($1, $2, $3)`
+		) VALUES ($1, $2, $3)
+		RETURNING
+			"id"`
 
-	_, err := impl.db.Query(
+	err := impl.db.QueryRow(
 		query,
 		entity.Name,
 		entity.Email,
-		entity.Password)
+		entity.Password).Scan(&entity.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	token, err := helper.GenerateJwtToken(entity.Name, entity.Email, JWT_SECRET_KEY)
+	token, err := helper.GenerateJwtToken(entity.Id, entity.Email, JWT_SECRET_KEY)
 	if err != nil {
 		return nil, err
 	}
