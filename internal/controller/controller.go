@@ -5,6 +5,7 @@ import (
 
 	"github.com/gabrielssssssssss/todo-list-api/config"
 	"github.com/gabrielssssssssss/todo-list-api/internal/controller/task"
+	"github.com/gabrielssssssssss/todo-list-api/internal/middlewares"
 	"github.com/gabrielssssssssss/todo-list-api/internal/repository"
 	"github.com/gabrielssssssssss/todo-list-api/internal/service"
 	"github.com/gin-gonic/gin"
@@ -21,7 +22,10 @@ func Controller() {
 	taskController := task.NewTaskController(&taskService)
 
 	app := gin.Default()
+	app.Use(middlewares.CORSMiddleware())
+
 	apiGroup := app.Group("/api")
 	taskController.Route(apiGroup)
+
 	app.Run(":8082")
 }
