@@ -26,7 +26,11 @@ func (impl *userRepositoryImpl) AddUser(entity *entity.UserEntity) (*model.UserM
 	`
 
 	var response model.UserModel
-	err := impl.db.QueryRow(query).Scan(&response)
+	err := impl.db.QueryRow(
+		query,
+		entity.Name,
+		entity.Email,
+		entity.Password).Scan(&response)
 	if err != nil {
 		return nil, err
 	}
