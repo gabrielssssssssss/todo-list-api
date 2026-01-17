@@ -69,7 +69,10 @@ func (impl *taskRepositoryImpl) UpdateTask(entity *entity.TaskEntity) (*model.Ta
 	_, cancel := config.NewPostgresContext()
 	defer cancel()
 
-	var payload []string
+	var (
+		payload  []string
+		response model.TaskModel
+	)
 
 	if entity.Description != "" {
 		payload = append(payload, fmt.Sprintf("description = '%s'", entity.Description))
@@ -80,8 +83,6 @@ func (impl *taskRepositoryImpl) UpdateTask(entity *entity.TaskEntity) (*model.Ta
 	if entity.Title != "" {
 		payload = append(payload, fmt.Sprintf("title = '%s'", entity.Title))
 	}
-
-	var response model.TaskModel
 
 	query := `
 	UPDATE tasks
@@ -118,6 +119,9 @@ func (impl *taskRepositoryImpl) UpdateTask(entity *entity.TaskEntity) (*model.Ta
 }
 
 func (impl *taskRepositoryImpl) GetTasks(entity *entity.TaskPaginationEntity) (*model.TaskPaginationModel, error) {
+	_, cancel := config.NewPostgresContext()
+	defer cancel()
+
 	var (
 		response model.TaskPaginationModel
 		tasks    []model.TaskPaginationData
