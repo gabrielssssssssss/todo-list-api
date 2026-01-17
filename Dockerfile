@@ -24,3 +24,4 @@ CMD sh -c "docker run --name to-do-list-api -e POSTGRES_PASSWORD=${POSTGRES_PASS
 #     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 #     updateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 # );
+
