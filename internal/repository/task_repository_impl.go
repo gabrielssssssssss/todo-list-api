@@ -47,7 +47,7 @@ func (impl *taskRepositoryImpl) DeleteTask(entity *entity.TaskEntity) (bool, err
 	return true, nil
 }
 
-func (impl *taskRepositoryImpl) UpdateTask(entity entity.TaskEntity) (*model.TaskModel, error) {
+func (impl *taskRepositoryImpl) UpdateTask(entity *entity.TaskEntity) (*model.TaskModel, error) {
 	_, cancel := config.NewPostgresContext()
 	defer cancel()
 
@@ -65,7 +65,9 @@ func (impl *taskRepositoryImpl) UpdateTask(entity entity.TaskEntity) (*model.Tas
 
 	query := fmt.Sprintf(
 		`UPDATE tasks SET %s, "updatedAt" = '%s' WHERE id = %s RETURNING "id", "title", "description", "status", "createdAt", "updatedAt";`,
-		strings.Join(payload, ", "), time.Now().Format("2006-01-02 15:04:05.000000"), entity.Id,
+		strings.Join(payload, ", "),
+		time.Now().Format("2006-01-02 15:04:05.000000"),
+		entity.Id,
 	)
 
 	var response model.TaskModel
@@ -74,6 +76,41 @@ func (impl *taskRepositoryImpl) UpdateTask(entity entity.TaskEntity) (*model.Tas
 	)
 	if err != nil {
 		return nil, err
+	}
+
+	return &response, nil
+}
+
+func (impl *taskRepositoryImpl) GetTasks(entity *entity.TaskPaginationEntity) (*model.TaskPaginationModel, error) {
+	var response model.TaskPaginationModel
+	var tasks []model.TaskPaginationData
+
+	queryResults := fmt.Sprintf(
+		`SELECT id, title, description FROM tasks LIMIT %v OFFSET %v`,
+		entity.Limit, entity.Limit*entity.Page,
+	)
+
+	rows, err := impl.db.Query(queryResults)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var task model.TaskPaginationData
+
+		err = rows.Scan(&task.Id, &task.Title, &task.Description)
+		if err != nil {
+			return nil, err
+		}
+
+		tasks = append(tasks, task)
+	}
+
+	response = model.TaskPaginationModel{
+		Data:  tasks,
+		Limit: entity.Limit,
+		Page:  entity.Page + 1,
 	}
 
 	return &response, nil

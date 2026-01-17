@@ -50,7 +50,21 @@ func (impl taskServiceImpl) UpdateTask(request *model.TaskModel) (*model.TaskMod
 		Description: request.Description,
 	}
 
-	response, err := impl.repository.UpdateTask(input)
+	response, err := impl.repository.UpdateTask(&input)
+	if err != nil {
+		return response, err
+	}
+
+	return response, nil
+}
+
+func (impl taskServiceImpl) GetTasks(request *model.TaskPaginationModel) (*model.TaskPaginationModel, error) {
+	input := entity.TaskPaginationEntity{
+		Page:  request.Page,
+		Limit: request.Limit,
+	}
+
+	response, err := impl.repository.GetTasks(&input)
 	if err != nil {
 		return response, err
 	}

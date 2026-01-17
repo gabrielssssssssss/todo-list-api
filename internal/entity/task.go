@@ -10,3 +10,8 @@ type TaskEntity struct {
 	CreatedAt   time.Time `json:"createdAt"`
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
+
+type TaskPaginationEntity struct {
+	Page  int64 `json:"page"`
+	Limit int64 `json:"limit"`
+}

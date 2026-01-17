@@ -9,6 +9,7 @@ type TaskService interface {
 	AddTask(request *model.TaskModel) (*model.TaskModel, error)
 	DeleteTask(request *model.TaskModel) (bool, error)
 	UpdateTask(request *model.TaskModel) (*model.TaskModel, error)
+	GetTasks(request *model.TaskPaginationModel) (*model.TaskPaginationModel, error)
 }
 
 type taskServiceImpl struct {

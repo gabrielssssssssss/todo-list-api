@@ -2,6 +2,7 @@ package task
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gabrielssssssssss/todo-list-api/internal/model"
 	"github.com/gabrielssssssssss/todo-list-api/internal/service"
@@ -69,6 +70,26 @@ func (controller *TaskController) UpdateTask(c *gin.Context) {
 	}
 
 	response, err := controller.TaskService.UpdateTask(&request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		c.Abort()
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (controller *TaskController) GetTasks(c *gin.Context) {
+	var request model.TaskPaginationModel
+
+	limit, err := strconv.ParseInt(c.Query("limit"), 10, 64)
+	page, err := strconv.ParseInt(c.Query("page"), 10, 64)
+
+	request.Limit = limit
+	request.Page = (page - 1)
+
+	response, err := controller.TaskService.GetTasks(&request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),

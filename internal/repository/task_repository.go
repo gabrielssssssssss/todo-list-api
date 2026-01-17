@@ -10,7 +10,8 @@ import (
 type TaskRepository interface {
 	AddTask(entity *entity.TaskEntity) (*model.TaskModel, error)
 	DeleteTask(entity *entity.TaskEntity) (bool, error)
-	UpdateTask(entity entity.TaskEntity) (*model.TaskModel, error)
+	UpdateTask(entity *entity.TaskEntity) (*model.TaskModel, error)
+	GetTasks(entity *entity.TaskPaginationEntity) (*model.TaskPaginationModel, error)
 }
 
 type taskRepositoryImpl struct {
