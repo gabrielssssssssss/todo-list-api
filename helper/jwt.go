@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gabrielssssssssss/todo-list-api/internal/middlewares"
 	"github.com/golang-jwt/jwt/v4"
 )
 
@@ -14,7 +13,7 @@ type JWTClaim struct {
 	jwt.RegisteredClaims
 }
 
-func GenerateJwtToken(name, email string) (string, error) {
+func GenerateJwtToken(name string, email string, key []byte) (string, error) {
 	claims := JWTClaim{
 		Name:  name,
 		Email: email,
@@ -23,7 +22,7 @@ func GenerateJwtToken(name, email string) (string, error) {
 		},
 	}
 
-	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(middlewares.JWT_SECRET_KEY)
+	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(key)
 	if err != nil {
 		return "", fmt.Errorf("Unable to create JWT with the given parameters.")
 	}

@@ -8,7 +8,7 @@ import (
 	"github.com/gabrielssssssssss/todo-list-api/internal/model"
 )
 
-func (impl userServiceImpl) AddUser(request *model.UserModel) (*model.UserModel, error) {
+func (impl userServiceImpl) AddUser(request *model.UserModel) (*model.UserTokenModel, error) {
 	if !helper.IsEmailValid(request.Email) || !helper.IsStrongerPassword(request.Password) {
 		return nil, fmt.Errorf("Email or password doesnt match with correct value.")
 	}

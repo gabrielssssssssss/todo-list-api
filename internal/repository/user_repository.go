@@ -8,7 +8,7 @@ import (
 )
 
 type UserRepository interface {
-	AddUser(*entity.UserEntity) (*model.UserModel, error)
+	AddUser(*entity.UserEntity) (*model.UserTokenModel, error)
 }
 
 type userRepositoryImpl struct {

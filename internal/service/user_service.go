@@ -6,7 +6,7 @@ import (
 )
 
 type UserService interface {
-	AddUser(request *model.UserModel) (*model.UserModel, error)
+	AddUser(request *model.UserModel) (*model.UserTokenModel, error)
 }
 
 type userServiceImpl struct {

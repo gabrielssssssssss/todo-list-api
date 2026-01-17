@@ -1,11 +1,18 @@
 package repository
 
 import (
+	"os"
+
+	"github.com/gabrielssssssssss/todo-list-api/helper"
 	"github.com/gabrielssssssssss/todo-list-api/internal/entity"
 	"github.com/gabrielssssssssss/todo-list-api/internal/model"
 )
 
-func (impl *userRepositoryImpl) AddUser(entity *entity.UserEntity) (*model.UserModel, error) {
+var (
+	JWT_SECRET_KEY = []byte(os.Getenv("JWT_SECRET_KEY"))
+)
+
+func (impl *userRepositoryImpl) AddUser(entity *entity.UserEntity) (*model.UserTokenModel, error) {
 	query := `
 		INSERT INTO users (
 			name, 
@@ -13,7 +20,6 @@ func (impl *userRepositoryImpl) AddUser(entity *entity.UserEntity) (*model.UserM
 			password
 		) VALUES ($1, $2, $3)`
 
-	var response model.UserModel
 	_, err := impl.db.Query(
 		query,
 		entity.Name,
@@ -23,5 +29,10 @@ func (impl *userRepositoryImpl) AddUser(entity *entity.UserEntity) (*model.UserM
 		return nil, err
 	}
 
-	return &response, nil
+	token, err := helper.GenerateJwtToken(entity.Name, entity.Email, JWT_SECRET_KEY)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.UserTokenModel{Token: token}, nil
 }
