@@ -14,15 +14,38 @@ func (impl *taskRepositoryImpl) AddTask(entity *entity.TaskEntity) (*model.TaskM
 	_, cancel := config.NewPostgresContext()
 	defer cancel()
 
-	query := fmt.Sprintf(
-		`INSERT INTO tasks (title, description, status) VALUES ('%s', '%s', '%s') RETURNING "id", "title", "description", "status", "createdAt", "updatedAt";`,
-		entity.Title, entity.Description, entity.Status,
-	)
+	query := `
+		INSERT INTO tasks (
+			title,
+			description,
+			status
+		)
+		VALUES ($1, $2, $3)
+		RETURNING
+			"id",
+			"title",
+			"description",
+			"status",
+			"createdAt",
+			"updatedAt";
+	`
 
 	var response model.TaskModel
-	err := impl.db.QueryRow(query).Scan(
-		&response.Id, &response.Title, &response.Description, &response.Status, &response.CreatedAt, &response.UpdatedAt,
+
+	err := impl.db.QueryRow(
+		query,
+		entity.Title,
+		entity.Description,
+		entity.Status,
+	).Scan(
+		&response.Id,
+		&response.Title,
+		&response.Description,
+		&response.Status,
+		&response.CreatedAt,
+		&response.UpdatedAt,
 	)
+
 	if err != nil {
 		return nil, err
 	}
@@ -34,12 +57,7 @@ func (impl *taskRepositoryImpl) DeleteTask(entity *entity.TaskEntity) (bool, err
 	_, cancel := config.NewPostgresContext()
 	defer cancel()
 
-	query := fmt.Sprintf(
-		`DELETE FROM tasks WHERE id = %s;`,
-		entity.Id,
-	)
-
-	_, err := impl.db.Query(query)
+	_, err := impl.db.Query(`DELETE FROM tasks WHERE id = ?;`, entity.Id)
 	if err != nil {
 		return false, err
 	}
@@ -63,17 +81,35 @@ func (impl *taskRepositoryImpl) UpdateTask(entity *entity.TaskEntity) (*model.Ta
 		payload = append(payload, fmt.Sprintf("title = '%s'", entity.Title))
 	}
 
-	query := fmt.Sprintf(
-		`UPDATE tasks SET %s, "updatedAt" = '%s' WHERE id = %s RETURNING "id", "title", "description", "status", "createdAt", "updatedAt";`,
-		strings.Join(payload, ", "),
-		time.Now().Format("2006-01-02 15:04:05.000000"),
+	var response model.TaskModel
+
+	query := `
+	UPDATE tasks
+	SET %s,
+	    "updatedAt" = $2
+	WHERE id = $3
+	RETURNING
+		"id",
+		"title",
+		"description",
+		"status",
+		"createdAt",
+		"updatedAt";
+	`
+
+	err := impl.db.QueryRow(
+		fmt.Sprintf(query, strings.Join(payload, ", ")),
+		time.Now(),
 		entity.Id,
+	).Scan(
+		&response.Id,
+		&response.Title,
+		&response.Description,
+		&response.Status,
+		&response.CreatedAt,
+		&response.UpdatedAt,
 	)
 
-	var response model.TaskModel
-	err := impl.db.QueryRow(query).Scan(
-		&response.Id, &response.Title, &response.Description, &response.Status, &response.CreatedAt, &response.UpdatedAt,
-	)
 	if err != nil {
 		return nil, err
 	}
@@ -82,15 +118,23 @@ func (impl *taskRepositoryImpl) UpdateTask(entity *entity.TaskEntity) (*model.Ta
 }
 
 func (impl *taskRepositoryImpl) GetTasks(entity *entity.TaskPaginationEntity) (*model.TaskPaginationModel, error) {
-	var response model.TaskPaginationModel
-	var tasks []model.TaskPaginationData
-
-	queryResults := fmt.Sprintf(
-		`SELECT id, title, description FROM tasks LIMIT %v OFFSET %v`,
-		entity.Limit, entity.Limit*entity.Page,
+	var (
+		response model.TaskPaginationModel
+		tasks    []model.TaskPaginationData
 	)
 
-	rows, err := impl.db.Query(queryResults)
+	query := `
+		SELECT
+			id,
+			title,
+			description
+		FROM tasks
+		LIMIT $1 OFFSET $2;
+	`
+
+	offset := entity.Limit * entity.Page
+
+	rows, err := impl.db.Query(query, entity.Limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -99,16 +143,25 @@ func (impl *taskRepositoryImpl) GetTasks(entity *entity.TaskPaginationEntity) (*
 	for rows.Next() {
 		var task model.TaskPaginationData
 
-		err = rows.Scan(&task.Id, &task.Title, &task.Description)
-		if err != nil {
+		if err := rows.Scan(
+			&task.Id,
+			&task.Title,
+			&task.Description,
+		); err != nil {
 			return nil, err
 		}
 
 		tasks = append(tasks, task)
 	}
 
-	var count int64
-	err = impl.db.QueryRow("SELECT COUNT(*) FROM tasks;").Scan(&count)
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	var total int64
+	err = impl.db.QueryRow(
+		`SELECT COUNT(*) FROM tasks;`,
+	).Scan(&total)
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +170,7 @@ func (impl *taskRepositoryImpl) GetTasks(entity *entity.TaskPaginationEntity) (*
 		Data:  tasks,
 		Limit: entity.Limit,
 		Page:  entity.Page + 1,
-		Total: count,
+		Total: total,
 	}
 
 	return &response, nil
