@@ -9,28 +9,16 @@ func (impl *userRepositoryImpl) AddUser(entity *entity.UserEntity) (*model.UserM
 	query := `
 		INSERT INTO users (
 			name, 
-			email, 
+			email,
 			password
-		) VALUES (
-			$1, 
-			$2, 
-			$3
-		)
-		RETURNING
-			"id"
-			"name"
-			"email"
-			"password"
-			"createdAt"
-			"updatedAt";
-	`
+		) VALUES ($1, $2, $3)`
 
 	var response model.UserModel
-	err := impl.db.QueryRow(
+	_, err := impl.db.Query(
 		query,
 		entity.Name,
 		entity.Email,
-		entity.Password).Scan(&response)
+		entity.Password)
 	if err != nil {
 		return nil, err
 	}

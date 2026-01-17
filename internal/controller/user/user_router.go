@@ -5,5 +5,5 @@ import (
 )
 
 func (controller *UserController) Route(rg *gin.RouterGroup) {
-	rg.POST("/todos", controller.AddUser)
+	rg.POST("/register", controller.AddUser)
 }
