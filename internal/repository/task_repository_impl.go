@@ -86,23 +86,23 @@ func (impl *taskRepositoryImpl) UpdateTask(entity *entity.TaskEntity) (*model.Ta
 		payload = append(payload, fmt.Sprintf("title = '%s'", entity.Title))
 	}
 
-	query := `
+	query := fmt.Sprintf(`
 	UPDATE tasks
 	SET %s,
-	    "updatedAt" = $2
-	WHERE id = $3
-	AND owner_id = $4
+	    "updated_at" = $1
+	WHERE id = $2
+	AND owner_id = $3
 	RETURNING
 		"id",
 		"title",
 		"description",
 		"status",
-		"createdAt",
-		"updatedAt";
-	`
+		"created_at",
+		"updated_at";
+	`, strings.Join(payload, ", "))
 
 	err := impl.db.QueryRow(
-		fmt.Sprintf(query, strings.Join(payload, ", ")),
+		query,
 		time.Now(),
 		entity.TaskId,
 		entity.OwnerId,
