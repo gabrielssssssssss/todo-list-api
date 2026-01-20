@@ -169,7 +169,7 @@ func (impl *taskRepositoryImpl) GetTasks(entity *entity.TaskPaginationEntity) (*
 
 	var total int64
 	err = impl.db.QueryRow(
-		`SELECT COUNT(*) FROM tasks WHERE owner_id = ?;`,
+		`SELECT COUNT(*) FROM tasks WHERE owner_id = $1;`,
 		entity.OwnerId,
 	).Scan(&total)
 	if err != nil {
