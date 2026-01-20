@@ -7,7 +7,7 @@ import (
 	"github.com/gabrielssssssssss/todo-list-api/internal/model"
 )
 
-func (impl taskServiceImpl) AddTask(request *entity.TaskEntity) (*model.TaskModel, error) {
+func (impl taskServiceImpl) AddTask(request *model.TaskModel) (*model.TaskModelResponse, error) {
 	if request.Title == "" || request.Description == "" {
 		return nil, fmt.Errorf("Title or description is missing.")
 	}
@@ -25,13 +25,13 @@ func (impl taskServiceImpl) AddTask(request *entity.TaskEntity) (*model.TaskMode
 	return response, nil
 }
 
-func (impl taskServiceImpl) DeleteTask(request *entity.TaskEntity) (bool, error) {
-	if request.Id == "" {
+func (impl taskServiceImpl) DeleteTask(request *model.TaskModel) (bool, error) {
+	if request.TaskId == "" {
 		return false, fmt.Errorf("The value is not number.")
 	}
 
 	input := entity.TaskEntity{
-		Id: request.Id,
+		TaskId: request.TaskId,
 	}
 
 	response, err := impl.repository.DeleteTask(&input)
@@ -42,9 +42,9 @@ func (impl taskServiceImpl) DeleteTask(request *entity.TaskEntity) (bool, error)
 	return response, nil
 }
 
-func (impl taskServiceImpl) UpdateTask(request *model.TaskModel) (*model.TaskModel, error) {
+func (impl taskServiceImpl) UpdateTask(request *model.TaskModel) (*model.TaskModelResponse, error) {
 	input := entity.TaskEntity{
-		Id:          request.Id,
+		TaskId:      request.TaskId,
 		Title:       request.Title,
 		Status:      request.Status,
 		Description: request.Description,
@@ -58,7 +58,7 @@ func (impl taskServiceImpl) UpdateTask(request *model.TaskModel) (*model.TaskMod
 	return response, nil
 }
 
-func (impl taskServiceImpl) GetTasks(request *model.TaskPaginationModel) (*model.TaskPaginationModel, error) {
+func (impl taskServiceImpl) GetTasks(request *model.TaskPaginationModel) (*model.TaskPaginationModelResponse, error) {
 	input := entity.TaskPaginationEntity{
 		Page:  request.Page,
 		Limit: request.Limit,

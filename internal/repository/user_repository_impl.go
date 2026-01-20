@@ -13,7 +13,7 @@ var (
 	JWT_SECRET_KEY = []byte(os.Getenv("JWT_SECRET_KEY"))
 )
 
-func (impl *userRepositoryImpl) Register(entity *entity.UserEntity) (*model.UserTokenModel, error) {
+func (impl *userRepositoryImpl) Register(entity *entity.UserEntity) (*model.UserModelResponse, error) {
 	query := `
 		INSERT INTO users (
 			name, 
@@ -37,10 +37,10 @@ func (impl *userRepositoryImpl) Register(entity *entity.UserEntity) (*model.User
 		return nil, err
 	}
 
-	return &model.UserTokenModel{Token: token}, nil
+	return &model.UserModelResponse{Token: token}, nil
 }
 
-func (impl *userRepositoryImpl) Login(entity *entity.UserEntity) (*model.UserTokenModel, error) {
+func (impl *userRepositoryImpl) Login(entity *entity.UserEntity) (*model.UserModelResponse, error) {
 	var hashPassword *string
 	err := impl.db.QueryRow(
 		`SELECT id, password FROM users WHERE email = $1`,
@@ -59,5 +59,5 @@ func (impl *userRepositoryImpl) Login(entity *entity.UserEntity) (*model.UserTok
 		return nil, err
 	}
 
-	return &model.UserTokenModel{Token: token}, nil
+	return &model.UserModelResponse{Token: token}, nil
 }

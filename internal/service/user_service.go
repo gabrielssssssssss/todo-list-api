@@ -6,8 +6,8 @@ import (
 )
 
 type UserService interface {
-	Register(request *model.UserModel) (*model.UserTokenModel, error)
-	Login(request *model.UserModel) (*model.UserTokenModel, error)
+	Register(request *model.UserModel) (*model.UserModelResponse, error)
+	Login(request *model.UserModel) (*model.UserModelResponse, error)
 }
 
 type userServiceImpl struct {

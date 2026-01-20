@@ -8,8 +8,8 @@ import (
 )
 
 type UserRepository interface {
-	Register(*entity.UserEntity) (*model.UserTokenModel, error)
-	Login(*entity.UserEntity) (*model.UserTokenModel, error)
+	Register(*entity.UserEntity) (*model.UserModelResponse, error)
+	Login(*entity.UserEntity) (*model.UserModelResponse, error)
 }
 
 type userRepositoryImpl struct {

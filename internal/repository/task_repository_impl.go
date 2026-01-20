@@ -10,7 +10,7 @@ import (
 	"github.com/gabrielssssssssss/todo-list-api/internal/model"
 )
 
-func (impl *taskRepositoryImpl) AddTask(entity *entity.TaskEntity) (*model.TaskModel, error) {
+func (impl *taskRepositoryImpl) AddTask(entity *entity.TaskEntity) (*model.TaskModelResponse, error) {
 	_, cancel := config.NewPostgresContext()
 	defer cancel()
 
@@ -31,7 +31,7 @@ func (impl *taskRepositoryImpl) AddTask(entity *entity.TaskEntity) (*model.TaskM
 			"updated_at";
 	`
 
-	var response model.TaskModel
+	var response model.TaskModelResponse
 
 	err := impl.db.QueryRow(
 		query,
@@ -59,7 +59,7 @@ func (impl *taskRepositoryImpl) DeleteTask(entity *entity.TaskEntity) (bool, err
 	_, cancel := config.NewPostgresContext()
 	defer cancel()
 
-	_, err := impl.db.Query(`DELETE FROM tasks WHERE id = ? AND owner_id = ?;`, entity.Id, entity.OwnerId)
+	_, err := impl.db.Query(`DELETE FROM tasks WHERE id = ? AND owner_id = ?;`, entity.TaskId, entity.OwnerId)
 	if err != nil {
 		return false, err
 	}
@@ -67,13 +67,13 @@ func (impl *taskRepositoryImpl) DeleteTask(entity *entity.TaskEntity) (bool, err
 	return true, nil
 }
 
-func (impl *taskRepositoryImpl) UpdateTask(entity *entity.TaskEntity) (*model.TaskModel, error) {
+func (impl *taskRepositoryImpl) UpdateTask(entity *entity.TaskEntity) (*model.TaskModelResponse, error) {
 	_, cancel := config.NewPostgresContext()
 	defer cancel()
 
 	var (
 		payload  []string
-		response model.TaskModel
+		response model.TaskModelResponse
 	)
 
 	if entity.Description != "" {
@@ -104,10 +104,10 @@ func (impl *taskRepositoryImpl) UpdateTask(entity *entity.TaskEntity) (*model.Ta
 	err := impl.db.QueryRow(
 		fmt.Sprintf(query, strings.Join(payload, ", ")),
 		time.Now(),
-		entity.Id,
+		entity.TaskId,
 		entity.OwnerId,
 	).Scan(
-		&response.Id,
+		&response.TaskId,
 		&response.Title,
 		&response.Description,
 		&response.Status,
@@ -122,13 +122,13 @@ func (impl *taskRepositoryImpl) UpdateTask(entity *entity.TaskEntity) (*model.Ta
 	return &response, nil
 }
 
-func (impl *taskRepositoryImpl) GetTasks(entity *entity.TaskPaginationEntity) (*model.TaskPaginationModel, error) {
+func (impl *taskRepositoryImpl) GetTasks(entity *entity.TaskPaginationEntity) (*model.TaskPaginationModelResponse, error) {
 	_, cancel := config.NewPostgresContext()
 	defer cancel()
 
 	var (
-		response model.TaskPaginationModel
-		tasks    []model.TaskPaginationData
+		response model.TaskPaginationModelResponse
+		tasks    []model.TaskPaginationModelResults
 	)
 
 	query := `
@@ -150,7 +150,7 @@ func (impl *taskRepositoryImpl) GetTasks(entity *entity.TaskPaginationEntity) (*
 	defer rows.Close()
 
 	for rows.Next() {
-		var task model.TaskPaginationData
+		var task model.TaskPaginationModelResults
 
 		if err := rows.Scan(
 			&task.Id,
@@ -176,11 +176,11 @@ func (impl *taskRepositoryImpl) GetTasks(entity *entity.TaskPaginationEntity) (*
 		return nil, err
 	}
 
-	response = model.TaskPaginationModel{
-		Data:  tasks,
-		Limit: entity.Limit,
-		Page:  entity.Page + 1,
-		Total: total,
+	response = model.TaskPaginationModelResponse{
+		Results: tasks,
+		Limit:   entity.Limit,
+		Page:    entity.Page + 1,
+		Total:   total,
 	}
 
 	return &response, nil
