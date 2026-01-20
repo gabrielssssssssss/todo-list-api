@@ -5,10 +5,10 @@ type UserModel struct {
 	Name      string `json:"name"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
-	CreatedAt string `json:"createdAt"`
-	UpdatedAt string `json:"updatedAt"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }
 
-type UserTokenModel struct {
+type UserModelResponse struct {
 	Token string `json:"token"`
 }

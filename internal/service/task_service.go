@@ -7,9 +7,9 @@ import (
 )
 
 type TaskService interface {
-	AddTask(request *entity.TaskEntity) (*model.TaskModel, error)
-	DeleteTask(request *entity.TaskEntity) (bool, error)
-	UpdateTask(request *model.TaskModel) (*model.TaskModel, error)
+	AddTask(request *model.TaskModel) (*entity.TaskEntity, error)
+	DeleteTask(request *model.TaskModel) (bool, error)
+	UpdateTask(request *model.TaskModel) (*entity.TaskEntity, error)
 	GetTasks(request *model.TaskPaginationModel) (*model.TaskPaginationModel, error)
 }
 
