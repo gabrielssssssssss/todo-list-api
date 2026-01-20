@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gabrielssssssssss/todo-list-api/internal/entity"
 	"github.com/gabrielssssssssss/todo-list-api/internal/model"
 	"github.com/gabrielssssssssss/todo-list-api/internal/service"
 	"github.com/gin-gonic/gin"
@@ -18,32 +19,32 @@ func NewTaskController(TaskService *service.TaskService) TaskController {
 }
 
 func (controller *TaskController) AddTask(c *gin.Context) {
-	var request = model.TaskModel{}
+	var req entity.TaskEntity
 
-	err := c.ShouldBindBodyWithJSON(&request)
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	req.Token = c.GetHeader("Authorization")
+
+	resp, err := controller.TaskService.AddTask(&req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
-		c.Abort()
+		return
 	}
 
-	response, err := controller.TaskService.AddTask(&request)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
-		c.Abort()
-	}
-
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, resp)
 }
 
 func (controller *TaskController) DeleteTask(c *gin.Context) {
-	var id = c.Param("id")
-
-	input := model.TaskModel{
-		Id: id,
+	input := entity.TaskEntity{
+		Id:    c.Param("id"),
+		Token: c.GetHeader("Authorization"),
 	}
 
 	_, err := controller.TaskService.DeleteTask(&input)
@@ -51,7 +52,7 @@ func (controller *TaskController) DeleteTask(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
-		c.Abort()
+		return
 	}
 
 	c.Status(204)
@@ -66,7 +67,7 @@ func (controller *TaskController) UpdateTask(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
-		c.Abort()
+		return
 	}
 
 	response, err := controller.TaskService.UpdateTask(&request)
@@ -74,7 +75,7 @@ func (controller *TaskController) UpdateTask(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
-		c.Abort()
+		return
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -94,7 +95,7 @@ func (controller *TaskController) GetTasks(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
-		c.Abort()
+		return
 	}
 
 	c.JSON(http.StatusOK, response)

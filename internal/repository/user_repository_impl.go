@@ -43,9 +43,9 @@ func (impl *userRepositoryImpl) Register(entity *entity.UserEntity) (*model.User
 func (impl *userRepositoryImpl) Login(entity *entity.UserEntity) (*model.UserTokenModel, error) {
 	var hashPassword *string
 	err := impl.db.QueryRow(
-		`SELECT password FROM users WHERE email = $1`,
+		`SELECT id, password FROM users WHERE email = $1`,
 		entity.Email,
-	).Scan(&hashPassword)
+	).Scan(&entity.Id, &hashPassword)
 	if err != nil {
 		return nil, err
 	}

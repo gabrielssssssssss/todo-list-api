@@ -24,18 +24,16 @@ func (controller *UserController) Register(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
-		c.Abort()
 	}
 
 	response, err := controller.UserService.Register(&request)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
-		c.Abort()
+	if err == nil {
+		c.JSON(http.StatusOK, response)
 	}
 
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusInternalServerError, gin.H{
+		"message": err.Error(),
+	})
 }
 
 func (controller *UserController) Login(c *gin.Context) {
@@ -46,16 +44,14 @@ func (controller *UserController) Login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
-		c.Abort()
 	}
 
 	response, err := controller.UserService.Login(&request)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
-		c.Abort()
+	if err == nil {
+		c.JSON(http.StatusOK, response)
 	}
 
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusInternalServerError, gin.H{
+		"message": err.Error(),
+	})
 }

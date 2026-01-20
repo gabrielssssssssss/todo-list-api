@@ -14,20 +14,22 @@ func (impl *taskRepositoryImpl) AddTask(entity *entity.TaskEntity) (*model.TaskM
 	_, cancel := config.NewPostgresContext()
 	defer cancel()
 
+	fmt.Println(entity)
 	query := `
 		INSERT INTO tasks (
 			title,
 			description,
-			status
+			status,
+			owner_id
 		)
-		VALUES ($1, $2, $3)
+		VALUES ($1, $2, $3, $4)
 		RETURNING
 			"id",
 			"title",
 			"description",
 			"status",
-			"createdAt",
-			"updatedAt";
+			"created_at",
+			"updated_at";
 	`
 
 	var response model.TaskModel
@@ -37,6 +39,7 @@ func (impl *taskRepositoryImpl) AddTask(entity *entity.TaskEntity) (*model.TaskM
 		entity.Title,
 		entity.Description,
 		entity.Status,
+		entity.OwnerId,
 	).Scan(
 		&response.Id,
 		&response.Title,
