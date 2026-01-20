@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gabrielssssssssss/todo-list-api/helper"
 	"github.com/gabrielssssssssss/todo-list-api/internal/model"
 	"github.com/gabrielssssssssss/todo-list-api/internal/service"
 	"github.com/gin-gonic/gin"
@@ -26,6 +27,18 @@ func (controller *TaskController) AddTask(c *gin.Context) {
 		})
 		return
 	}
+
+	authorization := c.GetHeader("Authorization")
+	ownerId, err := helper.GetJwtValue(authorization, "owner_id")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error":   "invalid_token",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	req.OwnerId = ownerId
 
 	task, err := controller.TaskService.AddTask(&req)
 	if err != nil {
@@ -52,8 +65,19 @@ func (controller *TaskController) DeleteTask(c *gin.Context) {
 		return
 	}
 
+	authorization := c.GetHeader("Authorization")
+	ownerId, err := helper.GetJwtValue(authorization, "owner_id")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error":   "invalid_token",
+			"message": err.Error(),
+		})
+		return
+	}
+
 	task := model.TaskModel{
-		TaskId: taskID,
+		TaskId:  taskID,
+		OwnerId: ownerId,
 	}
 
 	if _, err := controller.TaskService.DeleteTask(&task); err != nil {
@@ -87,6 +111,18 @@ func (controller *TaskController) UpdateTask(c *gin.Context) {
 	}
 
 	req.TaskId = taskID
+
+	authorization := c.GetHeader("Authorization")
+	ownerId, err := helper.GetJwtValue(authorization, "owner_id")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error":   "invalid_token",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	req.OwnerId = ownerId
 
 	updatedTask, err := controller.TaskService.UpdateTask(&req)
 	if err != nil {
@@ -125,9 +161,20 @@ func (tc *TaskController) GetTasks(c *gin.Context) {
 		return
 	}
 
+	authorization := c.GetHeader("Authorization")
+	ownerId, err := helper.GetJwtValue(authorization, "owner_id")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error":   "invalid_token",
+			"message": err.Error(),
+		})
+		return
+	}
+
 	request := model.TaskPaginationModel{
-		Limit: limit,
-		Page:  page - 1,
+		Limit:   limit,
+		Page:    page - 1,
+		OwnerId: ownerId,
 	}
 
 	tasks, err := tc.TaskService.GetTasks(&request)

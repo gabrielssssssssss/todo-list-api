@@ -1,6 +1,7 @@
 package model
 
 type TaskModel struct {
+	OwnerId     string
 	TaskId      string `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
@@ -19,9 +20,10 @@ type TaskModelResponse struct {
 }
 
 type TaskPaginationModel struct {
-	Page  int64 `json:"page"`
-	Limit int64 `json:"limit"`
-	Total int64 `json:"total"`
+	OwnerId string
+	Page    int64 `json:"page"`
+	Limit   int64 `json:"limit"`
+	Total   int64 `json:"total"`
 }
 
 type TaskPaginationModelResponse struct {

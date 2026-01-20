@@ -59,7 +59,7 @@ func (impl *taskRepositoryImpl) DeleteTask(entity *entity.TaskEntity) (bool, err
 	_, cancel := config.NewPostgresContext()
 	defer cancel()
 
-	_, err := impl.db.Query(`DELETE FROM tasks WHERE id = ? AND owner_id = ?;`, entity.TaskId, entity.OwnerId)
+	_, err := impl.db.Query(`DELETE FROM tasks WHERE id = $1 AND owner_id = $2;`, entity.TaskId, entity.OwnerId)
 	if err != nil {
 		return false, err
 	}
