@@ -3,17 +3,17 @@ package entity
 import "time"
 
 type TaskEntity struct {
-	Id          string    `json:"id"`
-	OwnerId     string    `json:"ownerId"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	Status      string    `json:"status"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
-	Token       string    `json:"token"`
+	TaskId      string
+	OwnerId     string
+	Title       string
+	Description string
+	Status      string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 type TaskPaginationEntity struct {
-	Page  int64 `json:"page"`
-	Limit int64 `json:"limit"`
+	Page    int64
+	Limit   int64
+	OwnerId string
 }

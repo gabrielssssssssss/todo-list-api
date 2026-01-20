@@ -14,7 +14,6 @@ func (impl *taskRepositoryImpl) AddTask(entity *entity.TaskEntity) (*model.TaskM
 	_, cancel := config.NewPostgresContext()
 	defer cancel()
 
-	fmt.Println(entity)
 	query := `
 		INSERT INTO tasks (
 			title,
@@ -41,7 +40,7 @@ func (impl *taskRepositoryImpl) AddTask(entity *entity.TaskEntity) (*model.TaskM
 		entity.Status,
 		entity.OwnerId,
 	).Scan(
-		&response.Id,
+		&response.TaskId,
 		&response.Title,
 		&response.Description,
 		&response.Status,
@@ -60,7 +59,7 @@ func (impl *taskRepositoryImpl) DeleteTask(entity *entity.TaskEntity) (bool, err
 	_, cancel := config.NewPostgresContext()
 	defer cancel()
 
-	_, err := impl.db.Query(`DELETE FROM tasks WHERE id = ?;`, entity.Id)
+	_, err := impl.db.Query(`DELETE FROM tasks WHERE id = ? AND owner_id = ?;`, entity.Id, entity.OwnerId)
 	if err != nil {
 		return false, err
 	}
@@ -92,6 +91,7 @@ func (impl *taskRepositoryImpl) UpdateTask(entity *entity.TaskEntity) (*model.Ta
 	SET %s,
 	    "updatedAt" = $2
 	WHERE id = $3
+	AND owner_id = $4
 	RETURNING
 		"id",
 		"title",
@@ -105,6 +105,7 @@ func (impl *taskRepositoryImpl) UpdateTask(entity *entity.TaskEntity) (*model.Ta
 		fmt.Sprintf(query, strings.Join(payload, ", ")),
 		time.Now(),
 		entity.Id,
+		entity.OwnerId,
 	).Scan(
 		&response.Id,
 		&response.Title,
@@ -136,12 +137,13 @@ func (impl *taskRepositoryImpl) GetTasks(entity *entity.TaskPaginationEntity) (*
 			title,
 			description
 		FROM tasks
-		LIMIT $1 OFFSET $2;
+		WHERE owner_id = $1
+		LIMIT $2 OFFSET $3;
 	`
 
 	offset := entity.Limit * entity.Page
 
-	rows, err := impl.db.Query(query, entity.Limit, offset)
+	rows, err := impl.db.Query(query, entity.OwnerId, entity.Limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +169,8 @@ func (impl *taskRepositoryImpl) GetTasks(entity *entity.TaskPaginationEntity) (*
 
 	var total int64
 	err = impl.db.QueryRow(
-		`SELECT COUNT(*) FROM tasks;`,
+		`SELECT COUNT(*) FROM tasks WHERE owner_id = ?;`,
+		entity.OwnerId,
 	).Scan(&total)
 	if err != nil {
 		return nil, err

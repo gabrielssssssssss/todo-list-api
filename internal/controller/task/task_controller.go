@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gabrielssssssssss/todo-list-api/internal/entity"
 	"github.com/gabrielssssssssss/todo-list-api/internal/model"
 	"github.com/gabrielssssssssss/todo-list-api/internal/service"
 	"github.com/gin-gonic/gin"
@@ -19,84 +18,129 @@ func NewTaskController(TaskService *service.TaskService) TaskController {
 }
 
 func (controller *TaskController) AddTask(c *gin.Context) {
-	var req entity.TaskEntity
-
+	var req model.TaskModel
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "invalid_request",
 			"message": err.Error(),
 		})
 		return
 	}
 
-	req.Token = c.GetHeader("Authorization")
-
-	resp, err := controller.TaskService.AddTask(&req)
+	task, err := controller.TaskService.AddTask(&req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "task_creation_failed",
 			"message": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, resp)
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "task created successfully",
+		"data":    task,
+	})
 }
 
 func (controller *TaskController) DeleteTask(c *gin.Context) {
-	input := entity.TaskEntity{
-		Id:    c.Param("id"),
-		Token: c.GetHeader("Authorization"),
+	taskID := c.Param("id")
+	if taskID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "missing_task_id",
+			"message": "task id is required",
+		})
+		return
 	}
 
-	_, err := controller.TaskService.DeleteTask(&input)
-	if err != nil {
+	task := model.TaskModel{
+		TaskId: taskID,
+	}
+
+	if _, err := controller.TaskService.DeleteTask(&task); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "task_deletion_failed",
 			"message": err.Error(),
 		})
 		return
 	}
 
-	c.Status(204)
+	c.Status(http.StatusNoContent)
 }
 
 func (controller *TaskController) UpdateTask(c *gin.Context) {
-	var request model.TaskModel
+	taskID := c.Param("id")
+	if taskID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "missing_task_id",
+			"message": "task id is required",
+		})
+		return
+	}
 
-	request.Id = c.Param("id")
-	err := c.ShouldBindBodyWithJSON(&request)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
+	var req model.TaskModel
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "invalid_request",
 			"message": err.Error(),
 		})
 		return
 	}
 
-	response, err := controller.TaskService.UpdateTask(&request)
+	req.TaskId = taskID
+
+	updatedTask, err := controller.TaskService.UpdateTask(&req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "task_update_failed",
 			"message": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "task updated successfully",
+		"data":    updatedTask,
+	})
 }
 
-func (controller *TaskController) GetTasks(c *gin.Context) {
-	var request model.TaskPaginationModel
+func (tc *TaskController) GetTasks(c *gin.Context) {
+	limitStr := c.Query("limit")
+	pageStr := c.Query("page")
 
-	limit, err := strconv.ParseInt(c.Query("limit"), 10, 64)
-	page, err := strconv.ParseInt(c.Query("page"), 10, 64)
+	limit, err := strconv.ParseInt(limitStr, 10, 64)
+	if err != nil || limit <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "invalid_limit",
+			"message": "limit must be a positive number",
+		})
+		return
+	}
 
-	request.Limit = limit
-	request.Page = (page - 1)
+	page, err := strconv.ParseInt(pageStr, 10, 64)
+	if err != nil || page <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "invalid_page",
+			"message": "page must be a positive number",
+		})
+		return
+	}
 
-	response, err := controller.TaskService.GetTasks(&request)
+	request := model.TaskPaginationModel{
+		Limit: limit,
+		Page:  page - 1,
+	}
+
+	tasks, err := tc.TaskService.GetTasks(&request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "task_fetch_failed",
 			"message": err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "tasks retrieved successfully",
+		"data":    tasks,
+	})
 }
