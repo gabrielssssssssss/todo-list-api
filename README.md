@@ -26,6 +26,23 @@ An roadmap.sh challenge who consist at build RESTful API for manage todo list.
 - Implement pagination and filtering for the to-do list
 
 
+## Deployment
+
+To deploy this project run
+
+```bash
+go build cmd/todo-list-api/main.go && ./main
+```
+
+For build Postgres database
+
+```bash
+createdb -h localhost -U postgres to_do_list_db
+```
+
+```bash
+psql -h localhost -U postgres -d to_do_list_db -f db/schema.sql
+```
 ## API Reference
 
 #### Register
@@ -229,36 +246,6 @@ An roadmap.sh challenge who consist at build RESTful API for manage todo list.
 ```
 
 
-## Deployment
+## Roadmap
 
-To deploy this project run
-
-```bash
-go build cmd/todo-list-api/main.go && ./main
-```
-
-For build Postgres database
-
-```bash
-createdb -h localhost -U postgres to_do_list_db
-```
-
-```bash
-psql -h localhost -U postgres -d to_do_list_db -f db/schema.sql
-```
-## Environment Variables
-
-To run this project, you will need to add the following environment variables to your .env file
-
-`JWT_SECRET_KEY` = Secret key used to sign and verify JWT tokens.
-It must be long, random, and kept strictly confidential.
-
-`POSTGRES_DB` =  Name of the PostgreSQL database used by the application.
-
-`POSTGRES_USR` = PostgreSQL username with permissions to access and modify the database.
-
-`POSTGRES_PWD` = Password associated with the PostgreSQL user.
-
-`POSTGRES_HOST` = ddress of the PostgreSQL server (e.g. localhost, 127.0.0.1, or a Docker service name).
-
-
+If you wish to take part in the roadmap.sh challenge, here is the URL of the challenge to train you: https://roadmap.sh/projects/todo-list-api
