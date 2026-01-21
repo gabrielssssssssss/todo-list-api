@@ -41,7 +41,6 @@ An roadmap.sh challenge who consist at build RESTful API for manage todo list.
 | `Password`      | `string` | **Required**. Enter string password|
 
 
-**Response**
 ```json
 {
     "data": {
@@ -65,7 +64,6 @@ An roadmap.sh challenge who consist at build RESTful API for manage todo list.
 | `Password`      | `string` | **Required**. Enter your password  |
 
 
-**Response**
 ```json
 {
     "data": {
@@ -77,7 +75,7 @@ An roadmap.sh challenge who consist at build RESTful API for manage todo list.
 
 ---
 
-#### 
+#### New tasks
 
 ```http
   POST /api/todos
@@ -89,8 +87,10 @@ An roadmap.sh challenge who consist at build RESTful API for manage todo list.
 | `Description`      | `string` | **Required**. Description less 200 char |
 
 
+| Headers            | Type     | Description                             |
+| :---------------   |:-------- | :---------------------------------      |
+| `Authorization`    | `string` | **Required**. JWT authentication token  |
 
-**Response**
 ```json
 {
     "data": {
@@ -104,3 +104,151 @@ An roadmap.sh challenge who consist at build RESTful API for manage todo list.
     "message": "task created successfully"
 }
 ```
+
+---
+
+#### Update tasks
+
+```http
+  PUT /api/todos/:id
+```
+
+| Payload            | Type     | Description                               |
+| :---------------   |:-------- | :---------------------------------        |
+| `Title`            | `string` | **Optional**. Title less than 50 char     |
+| `Description`      | `string` | **Optional**. Description less 200 char   |
+| `Status`           | `string` | **Optional**. Change status of your tasks |
+
+
+| Headers            | Type     | Description                             |
+| :---------------   |:-------- | :---------------------------------      |
+| `Authorization`    | `string` | **Required**. JWT authentication token  |
+
+```json
+{
+    "data": {
+        "id": "50",
+        "title": "Réunion équipe",
+        "description": "Annuler",
+        "status": "",
+        "created_at": "2026-01-21T13:41:13.044558Z",
+        "updated_at": "2026-01-21T13:50:39.573056Z"
+    },
+    "message": "task updated successfully"
+}
+```
+---
+
+#### Update tasks
+
+```http
+  PUT /api/todos/:id
+```
+
+| Payload            | Type     | Description                               |
+| :---------------   |:-------- | :---------------------------------        |
+| `Title`            | `string` | **Optional**. Title less than 50 char     |
+| `Description`      | `string` | **Optional**. Description less 200 char   |
+| `Status`           | `string` | **Optional**. Change status of your tasks |
+
+
+| Headers            | Type     | Description                             |
+| :---------------   |:-------- | :---------------------------------      |
+| `Authorization`    | `string` | **Required**. JWT authentication token  |
+
+```json
+{
+    "data": {
+        "id": "50",
+        "title": "Réunion équipe",
+        "description": "Annuler",
+        "status": "",
+        "created_at": "2026-01-21T13:41:13.044558Z",
+        "updated_at": "2026-01-21T13:50:39.573056Z"
+    },
+    "message": "task updated successfully"
+}
+```
+
+---
+
+#### Delete tasks
+
+```http
+  DELETE /api/todos/:id
+```
+
+| Headers            | Type     | Description                             |
+| :---------------   |:-------- | :---------------------------------      |
+| `Authorization`    | `string` | **Required**. JWT authentication token  |
+
+---
+
+#### Get tasks
+
+```http
+  GET /api/todos
+```
+
+| Params             | Type     | Description                                  |
+| :---------------   |:-------- | :---------------------------------           |
+| `page`             | `int` | **Required**. Pick the page you wanna see       |
+| `limit`            | `int` | **Required**. Put the limit of elements per page|
+
+
+| Headers            | Type     | Description                             |
+| :---------------   |:-------- | :---------------------------------      |
+| `Authorization`    | `string` | **Required**. JWT authentication token  |
+
+```json
+{
+    "data": {
+        "results": [
+            {
+                "id": 51,
+                "title": "Développement API",
+                "description": "Implémentation des endpoints REST pour la gestion des utilisateurs"
+            },
+            {
+                "id": 52,
+                "title": "Correction de bugs",
+                "description": "Résolution des erreurs de validation lors de la création des tâches"
+            },
+            {
+                "id": 53,
+                "title": "Sécurité JWT",
+                "description": "Mise en place et vérification de l’authentification par token JWT"
+            }
+        ],
+        "page": 1,
+        "limit": 3,
+        "total": 5
+    },
+    "message": "tasks retrieved successfully"
+}
+```
+
+
+## Environment Variables
+
+To run this project, you will need to add the following environment variables to your .env file
+
+`JWT_SECRET_KEY` = Secret key used to sign and verify JWT tokens.
+It must be long, random, and kept strictly confidential.
+
+`POSTGRES_DB` =  Name of the PostgreSQL database used by the application.
+
+`POSTGRES_USR` = PostgreSQL username with permissions to access and modify the database.
+
+`POSTGRES_PWD` = Password associated with the PostgreSQL user.
+
+`POSTGRES_HOST` = ddress of the PostgreSQL server (e.g. localhost, 127.0.0.1, or a Docker service name).
+
+
+
+## Roadmap
+
+- Additional browser support
+
+- Add more integrations
+
