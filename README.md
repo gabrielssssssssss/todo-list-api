@@ -1,45 +1,79 @@
-## Qu'est ce que Todo List API?
 
-**Todo List API** est un exercice de roadmap.sh qui consiste à créer une API dans la stack de notre choix.
+## API Reference
 
-Ce projet à pour but de nous apprendre **l'authentification utilisateur**, la conception de **schéma et de base données**, la conception **d'API RESTful**, l'opération **CRUD**, la gestion des **erreurs** ainsi que la **sécurité**.
+#### Register
 
-
-Pour que ce projet soit considérer comment validé, nous devons suivre plusieurs exigences tel que:
-
-- Pouvoir inscrire un utilisateur *(connexion/enregistrement)*.
-
-- Créer des **endpoints de connexion** pour authentifier l'utilisateur et générer un **JWT**.
-
-- Opérations **CRUD** pour la gestion de la liste des tâches.
-
-- Mettre en place une authentification des utilisateurs pour permettre uniquement aux utilisateurs autorisés d'accéder à la liste des tâches.
-
-- Mettre des mesures de gestion des **erreurs** et de **sécurité**.
-
-- Utiliser une base de données pour **stocker les données des utilisateurs et de la liste des tâches**.
-
-- Mettre une **validation des données** appropriée.
-
-- Mettre une **pagination et un filtrage** pour la liste des tâches.
-
-
-## ⚡ Try Todo List API
-
-Start a new project with Refine CORE in seconds using the following command:
-
-```sh
-npm create refine-app@latest my-refine-app
+```http
+  POST /api/register
 ```
 
-## Exemples
+| Payload |          Type     | Description                       |
+| :---------------|:-------- | :--------------------------------- |
+| `Name`          | `string` | **Required**. Name of your account |
+| `Email`         | `string` | **Required**. Put unique email     |
+| `Password`      | `string` | **Required**. Enter string password|
 
-Ici nous allons explorer l'intégralité des endpoints de l'API afin de mieux la comprendre:
 
+**Response**
 ```json
-
+{
+    "data": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvd25lcl9pZCI6IjciLCJlbWFpbCI6ImplYW5kdXBvbnRAZ21haWwuY29tIiwiZXhwIjoxNzY5MDE2OTIxfQ.pv8B3rsf80QgN1KZKlPUqSG2J3GAlYIcYseXwh30G7E"
+    },
+    "message": "user registered successfully"
+}
 ```
 
-## License
+---
 
-Licensed under the MIT License, Copyright © 2021-present Refinedev
+#### Login
+
+```http
+  POST /api/login
+```
+
+| Payload |          Type     | Description                       |
+| :---------------|:-------- | :--------------------------------- |
+| `Email`         | `string` | **Required**. Put unique email     |
+| `Password`      | `string` | **Required**. Enter your password  |
+
+
+**Response**
+```json
+{
+    "data": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvd25lcl9pZCI6IjciLCJlbWFpbCI6ImplYW5kdXBvbnRAZ21haWwuY29tIiwiZXhwIjoxNzY5MDE3MjAxfQ.uTKdTj8g2dVc2ep-GzIBGVCuu6lPTFx23btSGcaAlSY"
+    },
+    "message": "login successful"
+}
+```
+
+---
+
+#### 
+
+```http
+  POST /api/todos
+```
+
+| Payload            | Type     | Description                             |
+| :---------------   |:-------- | :---------------------------------      |
+| `Title`            | `string` | **Required**. Title less than 50 char   |
+| `Description`      | `string` | **Required**. Description less 200 char |
+
+
+
+**Response**
+```json
+{
+    "data": {
+        "id": "50",
+        "title": "Réunion équipe",
+        "description": "Brainstorming sur l'IA",
+        "status": "",
+        "created_at": "2026-01-21T13:41:13.044558Z",
+        "updated_at": "2026-01-21T13:41:13.044558Z"
+    },
+    "message": "task created successfully"
+}
+```
