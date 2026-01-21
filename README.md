@@ -1,5 +1,5 @@
 
-# Todo List API
+# 📇 Todo List API
 
 An roadmap.sh challenge who consist at build RESTful API for manage todo list.
 
@@ -229,6 +229,23 @@ An roadmap.sh challenge who consist at build RESTful API for manage todo list.
 ```
 
 
+## Deployment
+
+To deploy this project run
+
+```bash
+go build cmd/todo-list-api/main.go && ./main
+```
+
+For build Postgres database
+
+```bash
+createdb -h localhost -U postgres to_do_list_db
+```
+
+```bash
+psql -h localhost -U postgres -d to_do_list_db -f db/schema.sql
+```
 ## Environment Variables
 
 To run this project, you will need to add the following environment variables to your .env file
@@ -244,11 +261,4 @@ It must be long, random, and kept strictly confidential.
 
 `POSTGRES_HOST` = ddress of the PostgreSQL server (e.g. localhost, 127.0.0.1, or a Docker service name).
 
-
-
-## Roadmap
-
-- Additional browser support
-
-- Add more integrations
 
