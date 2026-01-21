@@ -33,5 +33,5 @@ func Controller() {
 	apiGroup := app.Group("/api")
 	userController.Route(apiGroup)
 	taskController.Route(apiGroup)
-	app.Run(":8085")
+	app.Run(":8080")
 }
